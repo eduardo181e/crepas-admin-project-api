@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     database: {
-        host: 'monorail.proxy.rlwy.net',
+        host: 'localhost',
         user: 'root',
-        password: 'f1dHHfHdehb5FFD12dbcbhFf2ChG-F5E',
+        password: 'password',
         database: 'crepas_db',
         timezone: '+00:00',
-        port: 21768
+        port: 3306
     }
 };

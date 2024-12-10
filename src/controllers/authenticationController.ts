@@ -209,7 +209,6 @@ res.status(500).json({ message: '405' });
       res.status(401).json({ message: 'Unknown Error' });
     }
   }  }}
-
   public async changeLanguage(req: Request, res: Response) {
     if(req.headers['authorization'] === undefined){
       res.status(405).json({message: 'Unauthorized'})

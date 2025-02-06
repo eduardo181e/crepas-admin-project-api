@@ -63,7 +63,7 @@ class Server {
         this.app.set('port', 3000);
         this.app.use(morgan('dev'));
         this.app.use(cors(            {
-          origin: 'https://admin-53d8e.web.app',
+          origin: 'http://localhost:4200',
           credentials: true
       }));
         this.app.use(express.json());

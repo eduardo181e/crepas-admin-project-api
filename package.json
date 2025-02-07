@@ -4,7 +4,7 @@
   "description": "api_aministrar la aplicasion",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -w",
     "dev": "nodemon build/index.js",
     "start": "node build/index.js"
   },

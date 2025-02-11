@@ -132,23 +132,25 @@ class CrepaSaladaIngredienteBaseController {
                     const adminId = decodedToken.id;
                     var ingredienteId;
                     const ingrediente_base = req.body.ingrediente_base;
-                    yield database_1.default.promise().query('INSERT INTO csib SET ?', { ingrediente_base: ingrediente_base, inventario: parseInt(req.body.inventario), adminId: adminId })
-                        .then((result) => {
-                        ingredienteId = result[0].insertId;
+                    yield database_1.default.promise().query('INSERT INTO csib SET ?', { ingrediente_base: ingrediente_base, inventario: req.body.inventario, adminId: adminId })
+                        .then((resutlt) => {
+                        console.log(resutlt[0].insertId);
+                        ingredienteId = resutlt[0].insertId;
                         res.json({ text: 'Ingrediente guardado' });
                     })
                         .catch(err => {
                         console.error('Error al guardar el ingrediente:', err);
                         res.status(500).json({ error: 'Error al guardar el ingrediente' });
                     });
-                    yield databaseuser_1.default.promise().query('SELECT * FROM sucursales AND adminId = ?', [adminId])
+                    // Crear registro de ventas y existencias
+                    yield databaseuser_1.default.promise().query('SELECT * FROM sucursales WHERE adminId = ?', [adminId])
                         .then((sucursales) => {
                         sucursales[0].forEach((sucursal) => __awaiter(this, void 0, void 0, function* () {
                             const registro = {
-                                product_id: ingredienteId,
                                 sucursal_id: sucursal.id,
+                                product_id: ingredienteId,
                                 ingrediente_base: ingrediente_base,
-                                cantidad: parseInt(req.body.inventario),
+                                cantidad: req.body.inventario,
                                 adminId: adminId
                             };
                             yield database_1.default.promise().query('INSERT INTO csibe SET ?', [registro])

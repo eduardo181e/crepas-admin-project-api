@@ -144,7 +144,7 @@ class WaflesCanastaIngredienteComplementarioController {
                         res.status(500).json({ error: 'Error al guardar el ingrediente' });
                     });
                     // Crear ventas y existencias de ingredientes complementarios
-                    yield databaseuser_1.default.promise().query('SELECT * FROM sucursales WHERE adminId = ?')
+                    yield databaseuser_1.default.promise().query('SELECT * FROM sucursales WHERE adminId = ?', [adminId])
                         .then((sucursales) => {
                         sucursales[0].forEach((sucursal) => __awaiter(this, void 0, void 0, function* () {
                             const registro = {

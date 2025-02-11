@@ -73,61 +73,63 @@ class CrepaSaladaIngredienteBaseController {
     }
 
     public async create(req: Request, res: Response): Promise<void> {
-        if(req.headers['authorization'] === undefined){
-            res.status(405).json({message: 'Unauthorized'})
-          }else{
-            const token:any = req.headers['authorization'];
-            const tokenWithoutBearer = token.replace('Bearer ', '');
-            
-            if (!tokenWithoutBearer) {
-              res.status(401).json({ message: 'Unauthorized' });
-            }
-            try{
-            const decodedToken:any = jwt.verify(tokenWithoutBearer, 'secreto-seguro'); // Decodificar el token
-            if (!decodedToken) {
-              res.status(401).json({ message: 'Invalid token' });
-            }
-            const adminId = decodedToken.id
+      if(req.headers['authorization'] === undefined){
+          res.status(405).json({message: 'Unauthorized'})
+        }else{
+          const token:any = req.headers['authorization'];
+          const tokenWithoutBearer = token.replace('Bearer ', '');
+          
+          if (!tokenWithoutBearer) {
+            res.status(401).json({ message: 'Unauthorized' });
+          }
+          try{
+          const decodedToken:any = jwt.verify(tokenWithoutBearer, 'secreto-seguro'); // Decodificar el token
+          if (!decodedToken) {
+            res.status(401).json({ message: 'Invalid token' });
+          }
+          const adminId = decodedToken.id
           var ingredienteId:any;
-          const ingrediente_base = req.body.ingrediente_base;
-          await pool.promise().query('INSERT INTO csib SET ?', {ingrediente_base:ingrediente_base, inventario: parseInt(req.body.inventario), adminId: adminId})
-          .then((result:any) => {
-              ingredienteId = result[0].insertId;
-              res.json({ text: 'Ingrediente guardado' });
+        const ingrediente_base = req.body.ingrediente_base;
+        await pool.promise().query('INSERT INTO csib SET ?', {ingrediente_base:ingrediente_base, inventario: req.body.inventario, adminId: adminId})
+        .then((resutlt:any) => {
+          console.log(resutlt[0].insertId);
+            ingredienteId = resutlt[0].insertId;
+            res.json({ text: 'Ingrediente guardado' });
+        })
+        .catch(err => {
+            console.error('Error al guardar el ingrediente:', err);
+            res.status(500).json({ error: 'Error al guardar el ingrediente' });
+        });
+      // Crear registro de ventas y existencias
+      await pool1.promise().query('SELECT * FROM sucursales WHERE adminId = ?', [adminId])
+      .then((sucursales:any) => {
+        sucursales[0].forEach(async (sucursal:any) => {
+          const registro = {
+            sucursal_id: sucursal.id,
+            product_id: ingredienteId,
+            ingrediente_base: ingrediente_base,
+            cantidad: req.body.inventario,
+            adminId: adminId
+          }
+
+          await pool.promise().query('INSERT INTO csibe SET ?', [registro])
+          .then(() => {
+            console.log('registro de existencias guardado')
           })
           .catch(err => {
-              console.error('Error al guardar el ingrediente:', err);
-              res.status(500).json({ error: 'Error al guardar el ingrediente' });
-          });
-          
-          await pool1.promise().query('SELECT * FROM sucursales AND adminId = ?', [adminId])
-          .then((sucursales:any) => {
-            sucursales[0].forEach(async (sucursal:any) => {
-              const registro = {
-                product_id: ingredienteId,
-                sucursal_id: sucursal.id,
-                ingrediente_base: ingrediente_base,
-                cantidad: parseInt(req.body.inventario),
-                adminId: adminId
-              }
-
-              await pool.promise().query('INSERT INTO csibe SET ?', [registro])
-              .then(() => {
-                console.log('registro de existencias guardado')
-              })
-              .catch(err => {
-                console.error('Error al guardar el registro de existencias:', err);
-              })
-            })
-          })}catch (error:any) {
-            if (error instanceof TokenExpiredError) {
-              res.status(401).json({ message: 'Token expired' });
-            } else {
-              res.status(401).json({ message: 'Unknown Error' });
-            }
+            console.error('Error al guardar el registro de existencias:', err);
+          })
+        })
+      })}catch (error:any) {
+          if (error instanceof TokenExpiredError) {
+            res.status(401).json({ message: 'Token expired' });
+          } else {
+            res.status(401).json({ message: 'Unknown Error' });
           }
         }
-    }
+      }
+  }
+
 
     public async delete(req: Request, res: Response){
         if(req.headers['authorization'] === undefined){

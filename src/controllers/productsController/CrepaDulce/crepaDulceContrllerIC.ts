@@ -105,7 +105,7 @@ class CrepaDulceIngredienteComplementarioController {
               res.status(500).json({ error: 'Error al guardar el ingrediente' });
           });
           // Crear ventas y existencias de ingredientes complementarios
-          await pool1.promise().query('SELECT * FROM sucursales WHERE adminId = ?')
+          await pool1.promise().query('SELECT * FROM sucursales WHERE adminId = ?', [adminId])
           .then((sucursales:any) => {
             sucursales[0].forEach(async (sucursal:any) => {
               const registro = {

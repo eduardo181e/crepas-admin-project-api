@@ -1,10 +1,10 @@
 
 export default {
     database: {
-        host: 'us-phx-web1267.main-hosting.eu',
-        user: 'u259029546_root1',
-        password: '0%#509.$19@81ed@256LA',
-        database: 'u259029546_crepas_users',
+        host: 'localhost',
+        user: 'root',
+        password: 'password',
+        database: 'crepas_users_db',
         timezone: '+00:00',
         port: 3306 
     }
